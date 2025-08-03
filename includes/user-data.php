@@ -4,11 +4,11 @@
 defined('ABSPATH') || exit;
 
 if (!isset($_GET['user_id']) || ! is_numeric($_GET['user_id'])) {
-    exit('اطلاعات ناقص است.');    
+    exit(__('User identity must be integer'));
   }
 $user_info = get_userdata($_GET['user_id']);
 if(! $user_info) {
-    exit('کاربر مورد نظر نمی‌باشد.');
+    exit(__('Not found user'));
 }
 $user_login = $user_info->user_login;
 $csv_files_posts =new WP_Query(
@@ -80,7 +80,7 @@ $csv_files_posts =new WP_Query(
                 </div>
                 
             <?php }else{
-                echo '<h>کاربر مورد نظر پیدا نشد.</h>';
+                echo "<h>" . __("can't find user") . "</h>";
             }
             ?>           
     
@@ -89,5 +89,5 @@ $csv_files_posts =new WP_Query(
 </div>
 <?php endwhile; ?>
 <?php else:?>
-<h1>داده‌ای موجود نیست.</h1>
+<h1><?php _e('Data has not be')?></h1>
 <?php endif;?>

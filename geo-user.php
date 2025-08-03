@@ -13,12 +13,27 @@
  * Domain Path:       /languages
  */
 
+ /*
+Geo User is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+any later version.
+
+Geo User is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Geo User. If not, see {URI to Plugin License}.
+*/
 // Exit if accessed directly
 defined('ABSPATH') || exit;
 
 /**
  * start up the engin
  */
+
 class WP_geo_user_plugin
 {
 
@@ -31,22 +46,22 @@ class WP_geo_user_plugin
 	function __construct()
 	{
 		register_activation_hook(__FILE__, [&$this, 'geo_user_activate']);
-		add_action( 'admin_menu',[$this, 'plugin_menu'] );
+		add_action( 'admin_menu',[$this, 'plugin_menu']);
 
 
 		add_action('edit_user_profile', [$this,'add_user_location_to_user_profile'],10);
 		add_action('show_user_profile', [$this,'add_user_location_to_user_profile'],10);
-		// add_action('user_new_form', [$this,'add_user_location_to_user_profile'],10);
+		add_action('user_new_form', [$this,'add_user_location_to_user_profile'],10);
 		add_action('personal_options_update', [$this,'add_user_location_to_user_profile'],10);
 		add_action('init',[$this,'excel_file_post_type']);
 		add_action('add_meta_boxes', [$this,'CSV_file_add_metabox']);
 		add_action('save_post', [$this,'csv_file_save'], 10, 1);
 
 
-		add_action('user_register', [$this,'save_user_locattion']);
-		add_action('profile_update', [$this,'save_user_locattion']);
-		add_action('personal_options_update', [$this,'save_user_locattion']);
-		add_action('edit_user_profile_update', [$this,'save_user_locattion']);
+		add_action('user_register', [$this,'save_user_location']);
+		add_action('profile_update', [$this,'save_user_location']);
+		add_action('personal_options_update', [$this,'save_user_location']);
+		add_action('edit_user_profile_update', [$this,'save_user_location']);
 
 		add_action('admin_enqueue_scripts', [$this, 'admin_enqueue']);
 
@@ -76,12 +91,12 @@ function add_user_location_to_user_profile($user)
     $long = get_user_meta($user->ID, 'long', true);
     $lat = get_user_meta($user->ID, 'lat', true);
     ?>
-    <h3>لوکیشن کاربر</h3>
+    <h3><?php _e('User location'); ?></h3>
 	<table class="form-table">
 		<tbody>			
 		<tr>
 			<th>
-				<label for="lat">عرض جغرافیایی</label>					
+				<label for="lat"><?php _e('Latitude') ?></label>
 			</th>
 			<td>
 				<input type="number" id="lat" name="lat" value="<?php echo $lat ?>">
@@ -89,7 +104,7 @@ function add_user_location_to_user_profile($user)
 		</tr>
 		<tr>
 				<th>
-					<label for="long">طول جغرافیایی</label>
+					<label for="long"><?php _e('Longitude') ?></label>
 				</th>
 				<td>
 					<input type="number" id="long" name="long" value="<?php echo $long ?>">				
@@ -102,18 +117,30 @@ function add_user_location_to_user_profile($user)
 }
 
 #SAVE FIELDS
-function save_user_locattion($user_id)
+function save_user_location($user_id)
 {
-    if (!current_user_can('edit_user', $user_id)) {
+    // Edit user
+    if (isset($_POST['action']) && $_POST['action'] === 'edituser') {
+        if (!current_user_can('edit_user', $user_id)) {
+            return;
+        }
+        if (empty($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'update-user_' . $user_id)) {
+            return;
+        }
+    }
+
+    // Check user creation only admin
+    if (!current_user_can('create_users')) {
         return;
     }
-    if (empty($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'update-user_' . $user_id)) {
-        return;
-    }    
-    update_user_meta($user_id, 'long', sanitize_text_field($_POST['long']));
-    update_user_meta($user_id, 'lat', sanitize_text_field($_POST['lat']));
-}
 
+    if (isset($_POST['lat'])) {
+        update_user_meta($user_id, 'lat', sanitize_text_field($_POST['lat']));
+    }
+    if (isset($_POST['long'])) {
+        update_user_meta($user_id, 'long', sanitize_text_field($_POST['long']));
+    }
+}
 	public static function getInstance()
 	{
 		if (!self::$instance) {
@@ -146,23 +173,23 @@ function save_user_locattion($user_id)
 public function plugin_menu() {	
 	add_submenu_page(
 		'users.php',
-		"پراکندگی مشتری‌ها روی نقشه",
-		"پراکندگی مشتری‌ها روی نقشه",
+		__('Users on the map'),
+		__('Users on the map'),
 		"manage_options",
 		"customer-location", //slug
 		function(){
-			include trailingslashit(plugin_dir_path(__FILE__)) .  "inc" . DIRECTORY_SEPARATOR . "location.php";
+			include trailingslashit(plugin_dir_path(__FILE__)) .  "includes" . DIRECTORY_SEPARATOR . "location.php";
 		},
 		3
 	);
 	add_submenu_page(
 		'',
-		'اطلاعات متشری',
-		'اطلاعات متشری',
+		__('User Data'),
+		__('User Data'),
 		'manage_options',
 		'customer-statistics',
 		function(){
-			include trailingslashit(plugin_dir_path(__FILE__)) .  "inc" . DIRECTORY_SEPARATOR . "user-data.php";
+			include trailingslashit(plugin_dir_path(__FILE__)) .  "includes" . DIRECTORY_SEPARATOR . "user-data.php";
 
 		}
 	);
