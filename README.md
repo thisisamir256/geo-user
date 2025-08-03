@@ -1,4 +1,4 @@
-# 🌍 Geo User – WordPress Plugin to Track and Manage User Locations on Map
+# 🌍 Geo User – WordPress Plugin to Give and Show User Locations on Map
 
 **Geo User** is a WordPress plugin that captures the geographic coordinates (latitude & longitude) of users during registration and displays all users on an interactive map in the WordPress admin panel.  
 It also allows the admin to edit each user's location directly from the map, and future versions will enable users to set their own location visually.
