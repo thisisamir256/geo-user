@@ -30,7 +30,7 @@ class WP_geo_user_plugin
 
 	function __construct()
 	{
-		register_activation_hook(__FILE__, [&$this, 'customer_location_activate']);
+		register_activation_hook(__FILE__, [&$this, 'geo_user_activate']);
 		add_action( 'admin_menu',[$this, 'plugin_menu'] );
 
 
@@ -63,7 +63,7 @@ class WP_geo_user_plugin
 	 */
 	
 
-	public function customer_location_activate()
+	public function geo_user_activate()
 	{
 
 	}
