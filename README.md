@@ -11,7 +11,7 @@ It also allows the admin to edit each user's location directly from the map, and
 - 🗺 Display all users on a map (admin-only view)
 - ✏️ Admin can edit individual user locations on the map and buy lon&lat
 - 🧭 Map view in user profile (admin panel)
-- ⚙️ Built-in support for interactive mapping (osm)
+- ⚙️ Built-in support for interactive mapping (OSM,Leaflet)
 - 🔒 Fully private – location data is only visible to administrators
 - 🔄 Future: Allow users to set/update their own location on the map
 
