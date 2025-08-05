@@ -85,6 +85,9 @@ $csv_files_posts =new WP_Query(
             ?>           
     
     <div class="clear"></div>
+    <div id="map">
+
+    </div>
     <?php endif ?>
 </div>
 <?php endwhile; ?>
