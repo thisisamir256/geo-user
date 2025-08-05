@@ -52,7 +52,6 @@ class WP_geo_user_plugin
 		add_action('edit_user_profile', [$this,'add_user_location_to_user_profile'],10);
 		add_action('show_user_profile', [$this,'add_user_location_to_user_profile'],10);
 		add_action('user_new_form', [$this,'add_user_location_to_user_profile'],10);
-		add_action('personal_options_update', [$this,'add_user_location_to_user_profile'],10);
 		add_action('init',[$this,'excel_file_post_type']);
 		add_action('add_meta_boxes', [$this,'CSV_file_add_metabox']);
 		add_action('save_post', [$this,'csv_file_save'], 10, 1);
@@ -85,6 +84,7 @@ class WP_geo_user_plugin
 
 function add_user_location_to_user_profile($user)
 {
+	
     if (!current_user_can('edit_user', $user->ID)) {
         return;
     }
@@ -122,6 +122,13 @@ function add_user_location_to_user_profile($user)
 #SAVE FIELDS
 function save_user_location($user_id)
 {
+	// Check user creation only admin
+	if (isset($_POST['action']) && $_POST['action'] === 'createuser') {
+        if (!current_user_can('create_users')) {
+            return;
+        }
+    }
+	
     // Edit user
     if (isset($_POST['action']) && $_POST['action'] === 'edituser') {
         if (!current_user_can('edit_user', $user_id)) {
@@ -132,9 +139,12 @@ function save_user_location($user_id)
         }
     }
 
-    // Check user creation only admin
-    if (!current_user_can('create_users')) {
-        return;
+    
+
+	if (!isset($_POST['action']) || $_POST['action'] === 'update') {
+        if (get_current_user_id() != $user_id) {
+            return;
+        }
     }
 
     if (isset($_POST['lat'])) {
