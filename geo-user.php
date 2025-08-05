@@ -34,6 +34,8 @@ defined('ABSPATH') || exit;
  * start up the engin
  */
 
+define( 'GEO_USER_VERSION', '1.0.0' );
+
 class WP_geo_user_plugin
 {
 
