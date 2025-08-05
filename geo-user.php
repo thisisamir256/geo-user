@@ -128,7 +128,7 @@ function save_user_location($user_id)
             return;
         }
     }
-	
+
     // Edit user
     if (isset($_POST['action']) && $_POST['action'] === 'edituser') {
         if (!current_user_can('edit_user', $user_id)) {
@@ -142,15 +142,15 @@ function save_user_location($user_id)
     
 
 	if (!isset($_POST['action']) || $_POST['action'] === 'update') {
-        if (get_current_user_id() != $user_id) {
+        if (get_current_user_id() != $user_id and !current_user_can('edit_user', $user_id)) {
             return;
         }
     }
 
-    if (isset($_POST['lat'])) {
+    if (isset($_POST['lat']) && is_numeric($_POST['lat'])) {
         update_user_meta($user_id, 'lat', sanitize_text_field($_POST['lat']));
     }
-    if (isset($_POST['long'])) {
+    if (isset($_POST['long']) && is_numeric($_POST['long'])) {
         update_user_meta($user_id, 'long', sanitize_text_field($_POST['long']));
     }
 }
