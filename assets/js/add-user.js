@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var marker = L.marker([lat,long]).addTo(map);
         map.on('click',function(e){
             marker.setLatLng(e.latlng);
-            console.log(e.latlng);
             latIn.value = e.latlng.lat;
             longIn.value = e.latlng.lng;
         });        
