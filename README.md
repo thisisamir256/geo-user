@@ -27,10 +27,8 @@ It also allows the admin to edit each user's location directly from the map, and
 ## 📝 TODO
 
 - [x] Allow users to set their location via front-end map
-- [ ] Enable marker clustering on admin map for large user bases
 - [ ] Add filter to map view by user role or location
 - [ ] Provide REST API endpoints to access/update location data
-- [ ] Support Google Maps as an alternative to Leaflet
 - [ ] Add settings page for controlling geolocation behavior
 
 
