@@ -193,7 +193,8 @@ public function plugin_menu() {
 		'manage_options',
 		'geo-user',
 		function(){
-			echo 'hello';
+			wp_redirect(admin_url('admin.php?page=locations'));
+            exit;
 		},
 		'dashicons-admin-site',
 
@@ -219,7 +220,19 @@ public function plugin_menu() {
 			include trailingslashit(plugin_dir_path(__FILE__)) .  "includes" . DIRECTORY_SEPARATOR . "user-data.php";
 
 		}
-	);
+	);	
+	add_submenu_page(
+		'geo-user',
+		__('settings'),
+		__('Settings'),
+		'manage_options',
+		'geo-user-settings',
+		function(){
+			echo 'settins';
+			exit;
+
+		}
+	);	
 	add_action('admin_head', function() {
         remove_submenu_page('geo-user', 'geo-user');
     });
