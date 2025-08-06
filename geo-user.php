@@ -187,19 +187,30 @@ function save_user_location($user_id)
  * Add a plugin page.
  */
 public function plugin_menu() {	
+	add_menu_page(
+		__('Geo User1'),
+		__('Geo User'),
+		'manage_options',
+		'geo-user',
+		function(){
+			echo 'hello';
+		},
+		'dashicons-admin-site',
+
+	);
 	add_submenu_page(
-		'users.php',
+		'geo-user',
 		__('Users on the map'),
 		__('Users on the map'),
 		"manage_options",
-		"customer-location", //slug
+		"locations", //slug
 		function(){
 			include trailingslashit(plugin_dir_path(__FILE__)) .  "includes" . DIRECTORY_SEPARATOR . "location.php";
 		},
 		3
 	);
 	add_submenu_page(
-		'',
+		'geo-user',
 		__('User Data'),
 		__('User Data'),
 		'manage_options',
@@ -209,6 +220,9 @@ public function plugin_menu() {
 
 		}
 	);
+	add_action('admin_head', function() {
+        remove_submenu_page('geo-user', 'geo-user');
+    });
 }
 /**
  * create new post type for save excel file and read after
