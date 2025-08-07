@@ -178,9 +178,6 @@ function save_user_location($user_id)
 		wp_enqueue_script('leaflet', plugins_url('/assets/leaflet/leaflet.js', __FILE__), [], '1.9.3', false);
 		wp_enqueue_script('upload-file', plugins_url('/assets/js/upload-file.js', __FILE__));
 		wp_enqueue_script('add-user', plugins_url('/assets/js/add-user.js', __FILE__));
-
-
-
 	}
 	
 	/**
