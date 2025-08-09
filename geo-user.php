@@ -53,20 +53,12 @@ class WP_geo_user_plugin
 
 		add_action('edit_user_profile', [$this,'add_user_location_to_user_profile'],10);
 		add_action('show_user_profile', [$this,'add_user_location_to_user_profile'],10);
-		add_action('user_new_form', [$this,'add_user_location_to_user_profile'],10);
-		add_action('init',[$this,'excel_file_post_type']);
-		add_action('add_meta_boxes', [$this,'CSV_file_add_metabox']);
-		add_action('save_post', [$this,'csv_file_save'], 10, 1);
-
-
+		add_action('user_new_form', [$this,'add_user_location_to_user_profile'],10);		
 		add_action('user_register', [$this,'save_user_location']);
 		add_action('profile_update', [$this,'save_user_location']);
 		add_action('personal_options_update', [$this,'save_user_location']);
 		add_action('edit_user_profile_update', [$this,'save_user_location']);
-
 		add_action('admin_enqueue_scripts', [$this, 'admin_enqueue']);
-
-		add_action( 'wp_ajax_my_action', [$this,'my_action']);
 
 	}
 	/**
@@ -91,7 +83,7 @@ function add_user_location_to_user_profile($user)
         return;
     }
     $long = get_user_meta($user->ID, 'long', true);
-    $lat = get_user_meta($user->ID, 'lat', true);
+    $lat = get_user_meta($user->ID, 'lat', true);	
     ?>
     <h3><?php _e('User location'); ?></h3>
 	<table class="form-table">
@@ -101,7 +93,7 @@ function add_user_location_to_user_profile($user)
 				<label for="lat"><?php _e('Latitude') ?></label>
 			</th>
 			<td>
-				<input type="number" id="lat" name="lat" value="<?php echo $lat ?>">
+				<input type="number" id="lat" name="lat" value="<?php echo esc_attr($lat); ?>">
 			</td>
 		</tr>
 		<tr>
@@ -109,15 +101,13 @@ function add_user_location_to_user_profile($user)
 					<label for="long"><?php _e('Longitude') ?></label>
 				</th>
 				<td>
-					<input type="number" id="long" name="long" value="<?php echo $long ?>">				
+					<input type="number" id="long" name="long" value="<?php echo esc_attr($long); ?>">				
 				</td>
 			</tr>
 		</tbody>
 	</table>
-	<div id="map" style="height:500px; width:100%;" data-lat="<?php echo $lat ?>" data-long="<?php echo $long; ?>">
-
-	</div>
-    
+	<div id="map" style="height:500px; width:100%;" data-lat="<?php  echo esc_attr($lat) ?>" data-long="<?php echo esc_attr($long); ?>">
+	</div>    
 <?php
 }
 
@@ -149,11 +139,19 @@ function save_user_location($user_id)
         }
     }
 
-    if (isset($_POST['lat']) && is_numeric($_POST['lat'])) {
-        update_user_meta($user_id, 'lat', sanitize_text_field($_POST['lat']));
+    if (isset($_POST['lat'])) {
+		$lat = floatval($_POST['lat']);
+		if ($lat < -90 || $lat > 90) {
+			$lat = null;
+		}		
+        update_user_meta($user_id, 'lat', $lat);
     }
-    if (isset($_POST['long']) && is_numeric($_POST['long'])) {
-        update_user_meta($user_id, 'long', sanitize_text_field($_POST['long']));
+    if (isset($_POST['long'])) {
+		$long = floatval($_POST['long']);
+		if ($long < -180 || $long > 180){
+			$long = null;
+		}
+        update_user_meta($user_id, 'long', $long);
     }
 }
 	public static function getInstance()
@@ -234,73 +232,6 @@ public function plugin_menu() {
         remove_submenu_page('geo-user', 'geo-user');
     });
 }
-/**
- * create new post type for save excel file and read after
- */
-public static function excel_file_post_type() {
-	register_post_type('cl-csv',
-		array(
-			'labels'      => array(
-				'name'          => __('csv', 'textdomain'),
-				'singular_name' => __('csv', 'textdomain'),
-			),
-				'public'      => true,
-				'has_archive' => false,
-				'exclude_from_search' => true,
-				'show_in_menu' => 'users.php',
-				'show_in_nav_menus' => true,
-				'show_in_rest' => false,
-				'menu_position'=>4,
-				'supports' => [
-					'title',
-					'editor',
-					'revisions',
-					'author',
-				],
-				'rewrite' => false,
-		)
-	);
-}
-
-function CSV_file_add_metabox()
-{
-    add_meta_box('csvfilediv', __('CSV file', 'text-domain'), [$this,'CSV_file_metabox'], 'cl-csv');
-}
-
-function CSV_file_metabox($post)
-{
-    global $content_width, $_wp_additional_image_sizes;
-
-    $csv_id = get_post_meta($post->ID, '_csv_file', true);
-
-    $old_content_width = $content_width;
-    $content_width = 254;
-
-    if ($csv_id && get_post($csv_id)) {        
-		$csv_url = wp_get_attachment_url($csv_id);
-        if (!empty($csv_url)) {
-            $content = '<a href="'.$csv_url . '">فایل جاری</a>';
-            $content .= '<p class="hide-if-no-js"><a href="javascript:;" id="remove_csv_file_button" >' . esc_html__('Remove Mobile Image', 'text-domain') . '</a></p>';
-            $content .= '<input type="hidden" id="upload_listing_image" name="_listing_cover_image" value="' . esc_attr($csv_id) . '" />';
-        }
-        $content_width = $old_content_width;
-    } else {
-		$content ='<a href="" style="display:none;">فایل جاری</a>';
-        $content .= '<p class="hide-if-no-js"><a title="' . esc_attr__('select csv file', 'text-domain') . '" href="javascript:;" id="upload_csv_file_button" id="set-csv-file" data-uploader_title="' . esc_attr__('select a csv file', 'text-domain') . '" data-uploader_button_text="' . esc_attr__('set csv file', 'text-domain') . '">' . esc_html__('set csv file', 'text-domain') . '</a></p>';
-        $content .= '<input type="hidden" id="upload_csv_file" name="_csv_file" value="" />';
-    }
-
-    echo $content;
-}
-
-function csv_file_save($post_id)
-{
-    if (isset($_POST['_csv_file'])) {
-        $csv_id = (int) $_POST['_csv_file'];
-        update_post_meta($post_id, '_csv_file', $csv_id);
-    }
-}
-
 
 } /// END CLASS
 

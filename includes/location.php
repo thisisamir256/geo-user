@@ -15,6 +15,9 @@ $customer_statictics_url = menu_page_url('customer-statistics',false);
 foreach ($users as $user) {
 	$long = get_user_meta($user->ID, 'long', true);
     $lat = get_user_meta($user->ID, 'lat', true);
+	if (is_null($long) || is_null($lat)) {
+		continue;
+	}
 	$company = get_user_meta($user->ID, 'billing_company',true);
 	if($long && $lat) {
 	$users_meta[] = [
