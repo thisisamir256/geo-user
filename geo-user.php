@@ -165,7 +165,7 @@ function save_user_location($user_id)
 
 	public function textdomain()
 	{
-		load_plugin_textdomain('cltextdomain', false, plugin_dir_path(__FILE__) . 'languages/');
+		load_plugin_textdomain('geo-user', false, plugin_dir_path(__FILE__) . 'languages/');
 	}
 /**
  * Add plugin assets
@@ -173,7 +173,7 @@ function save_user_location($user_id)
 	function admin_enqueue()
 	{
 		wp_enqueue_style('leaflet',plugins_url('/assets/leaflet/leaflet.css', __FILE__),'1.9.3');
-		wp_enqueue_script('leaflet', plugins_url('/assets/leaflet/leaflet.js', __FILE__), [], '1.9.3', false);
+		wp_enqueue_script('leaflet', plugins_url('/assets/leaflet/leaflet.js', __FILE__), [], '1.9.3', true);
 		wp_enqueue_script('upload-file', plugins_url('/assets/js/upload-file.js', __FILE__));
 		wp_enqueue_script('add-user', plugins_url('/assets/js/add-user.js', __FILE__));
 	}
@@ -188,7 +188,7 @@ public function plugin_menu() {
 		'manage_options',
 		'geo-user',
 		function(){
-			wp_redirect(admin_url('admin.php?page=locations'));
+			wp_safe_redirect(admin_url('admin.php?page=locations'));
             exit;
 		},
 		'dashicons-admin-site',
