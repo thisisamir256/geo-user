@@ -2,50 +2,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const mapDiv = document.getElementById('map');
     if (!mapDiv) return;
 
-    // settings
+    // Settings
     const TABRIZ_COORDS = [38.0965, 46.2755];
     const WORLD_ZOOM = 2;
     const DEFAULT_ZOOM = 12;
     
-    // Inputs
+    // Form Inputs
     const latInput = document.getElementById('lat');
     const longInput = document.getElementById('long');
     
-    // primary inputs value
+    // Initial values
     const initialLat = parseFloat(mapDiv.dataset.lat);
     const initialLong = parseFloat(mapDiv.dataset.long);
     
-    // create map
-    const map = L.map('map');
+    // Create map
+    const map = L.map('map', {
+        zoomControl: true,
+        dragging: true
+    });
+    
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     
-    // managment start value
+    // Marker managment
     let marker = null;
     
+    // First: user has location
     if (initialLat && initialLong) {
-        // first: we have initial values
         map.setView([initialLat, initialLong], DEFAULT_ZOOM);
         marker = createMarker([initialLat, initialLong]);
         updateInputs(initialLat, initialLong);
-    } else {
-        // seconds: havn't initial values
+    } 
+    // Second: user hasn't location
+    else {
         map.setView(TABRIZ_COORDS, WORLD_ZOOM);
     }
     
-    // Click managment on the map
+    // Click event
     map.on('click', function(e) {
-        const clickedLatLng = e.latlng;
+        const clickedPos = e.latlng;
         
         if (!marker) {
-            marker = createMarker(clickedLatLng);
+            marker = createMarker(clickedPos);
         } else {
-            marker.setLatLng(clickedLatLng);
+            marker.setLatLng(clickedPos);
         }
         
-        updateInputs(clickedLatLng.lat, clickedLatLng.lng);
-        map.setView(clickedLatLng, DEFAULT_ZOOM);
+        updateInputs(clickedPos.lat, clickedPos.lng);
     });
     
     // Helper functions
@@ -65,27 +69,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (longInput) longInput.value = lng.toFixed(6);
     }
     
-    // Managment change from inputs
+    // Chnage marker by input change
     if (latInput && longInput) {
         const handleInputChange = function() {
             const newLat = parseFloat(latInput.value);
             const newLng = parseFloat(longInput.value);
             
-            if (isNaN(newLat) || isNaN(newLng)) {
-                if (marker) {
-                    map.removeLayer(marker);
-                    marker = null;
+            if (!isNaN(newLat) && !isNaN(newLng)) {
+                if (!marker) {
+                    marker = createMarker([newLat, newLng]);
+                } else {
+                    marker.setLatLng([newLat, newLng]);
                 }
-                map.setView(TABRIZ_COORDS, WORLD_ZOOM);
-                return;
+                map.setView([newLat, newLng], DEFAULT_ZOOM);
             }
-            
-            if (!marker) {
-                marker = createMarker([newLat, newLng]);
-            } else {
-                marker.setLatLng([newLat, newLng]);
-            }
-            map.setView([newLat, newLng], DEFAULT_ZOOM);
         };
         
         latInput.addEventListener('change', handleInputChange);
