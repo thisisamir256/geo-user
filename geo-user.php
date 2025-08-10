@@ -59,6 +59,7 @@ class WP_geo_user_plugin
 		add_action('personal_options_update', [$this,'save_user_location']);
 		add_action('edit_user_profile_update', [$this,'save_user_location']);
 		add_action('admin_enqueue_scripts', [$this, 'admin_enqueue']);
+		add_action('admin_init', [$this,'settings_init']);
 
 	}
 	/**
@@ -222,15 +223,57 @@ public function plugin_menu() {
 		__('Settings'),
 		'manage_options',
 		'geo-user-settings',
-		function(){
-			echo 'settins';
-			exit;
-
+		function() {
+			// Test user accesibilty
+			if (!current_user_can('manage_options')) {
+				return;
+			}
+	
+			// Show field
+			echo '<div class="wrap">';
+			echo '<h1>' . esc_html(get_admin_page_title()) . '</h1>';
+			echo '<form action="options.php" method="post">';
+	
+			// Settings field
+			settings_fields('geo_user_settings_group'); // Settings group
+			do_settings_sections('geo-user-settings'); // slug
+			submit_button(__('Save'));	
+			echo '</form>';
+			echo '</div>';
 		}
 	);	
 	add_action('admin_head', function() {
         remove_submenu_page('geo-user', 'geo-user');
     });
+}
+function settings_init() {
+    # Register Settings
+    register_setting(
+        'geo_user_settings_group', #Create own group
+        'geo_user_accesibility'     #name
+    );
+
+    // Add a section in setting page
+    add_settings_section(
+        'geo_user_settings_section',
+        __('Locations Accesibilty Setting'), // Title
+        function() {
+            echo '<p>' . __('Users Location Accesibilty') . '</p>';
+        },
+        'geo-user-settings' // #Slug
+    );
+
+	// Add field
+    add_settings_field(
+        'geo_user_settings_field',
+        __('Accecibilty role'), // Field title
+        function() {
+            $value = get_option('geo_user_accesibility');
+            echo '<input type="text" name="geo_user_accesibility" value="' . esc_attr($value) . '" class="regular-text">';
+        },
+        'geo-user-settings', // Slug
+        'geo_user_settings_section' // Sectio ID
+    );
 }
 
 } /// END CLASS
